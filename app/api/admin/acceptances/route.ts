@@ -1,12 +1,17 @@
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getAcceptancesForAdmin } from "@/lib/supabase-admin";
 
 export async function GET() {
-  const headerStore = await headers();
-  const adminToken = headerStore.get("x-admin-token") ?? "";
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
 
-  if (!process.env.ADMIN_TOKEN || adminToken !== process.env.ADMIN_TOKEN) {
+  if (!process.env.ADMIN_SESSION_SECRET) {
+    console.error("Missing ADMIN_SESSION_SECRET env var.");
+    return NextResponse.json({ error: "Servidor não configurado." }, { status: 500 });
+  }
+
+  if (!session || session.value !== "authenticated") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -17,13 +17,14 @@
 .install-copy .eyebrow { display:inline-block; margin:0; }
 .install-copy p { margin:0; max-width:420px; color:#4e665d; font-size:14px; line-height:1.5; }
 .store-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-.store-badge { display:flex; align-items:center; gap:10px; min-height:82px; padding:14px 18px; border-radius:12px; text-decoration:none; color:#fff; background:#0f2d1f; border:1px solid rgba(255,255,255,.04); box-shadow:0 12px 24px rgba(10,47,31,.18); transition:transform .2s ease, box-shadow .2s ease; }
-.store-badge:hover { transform:translateY(-2px); box-shadow:0 18px 32px rgba(10,47,31,.22); }
-.badge-icon { display:grid; place-items:center; width:32px; height:32px; flex:none; border-radius:8px; background:transparent; border:none; }
+.store-badge { display:flex; align-items:center; justify-content:flex-start; gap:14px; min-height:96px; padding:16px 18px; border-radius:18px; text-decoration:none; color:#fff; background:linear-gradient(180deg,#0d1212,#0b0f10); border:1px solid rgba(255,255,255,.04); box-shadow:0 18px 30px rgba(0,0,0,.18); transition:transform .2s ease, box-shadow .2s ease; }
+.store-badge:hover { transform:translateY(-2px); box-shadow:0 20px 34px rgba(0,0,0,.22); }
+.badge-icon { display:grid; place-items:center; width:42px; height:42px; flex:none; border-radius:12px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.04); }
 .store-row img { width:24px; height:24px; object-fit:contain; }
 .store-badge span { display:block; }
-.store-badge small { display:block; margin-bottom:3px; color:rgba(255,255,255,.72); font-size:10px; line-height:1; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
-.store-badge b { display:block; color:#fff; font-size:1.05rem; line-height:1.15; font-weight:800; letter-spacing:-.03em; }
+.store-badge small { display:block; margin-bottom:4px; color:rgba(255,255,255,.72); font-size:10px; line-height:1.1; font-weight:700; letter-spacing:.06em; text-transform:none; }
+.store-badge b { display:block; color:#fff; font-size:clamp(1.2rem,1.8vw,2rem); line-height:1.05; font-weight:800; letter-spacing:-.05em; }
+.store-badge.apple b, .store-badge.google b { white-space:nowrap; }
 .info-contact { display:flex; align-items:center; justify-content:space-between; gap:18px; max-width:1050px; margin:0 auto 20px; padding:18px 20px; border:1px solid rgba(118,158,132,.25); border-radius:18px; background:rgba(255,255,255,.6); box-shadow:0 18px 35px rgba(11,62,43,.06); }
 .info-contact-copy { display:flex; flex-direction:column; gap:8px; }
 .info-contact-copy p { margin:0; color:#5d766a; font-size:14px; line-height:1.5; }

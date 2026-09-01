@@ -52,7 +52,7 @@ export default function Admin() {
 
   async function loadAcceptances() {
     const response = await fetch("/api/admin/acceptances", {
-      headers: { "x-admin-token": process.env.NEXT_PUBLIC_ADMIN_TOKEN || "" },
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -69,22 +69,31 @@ export default function Admin() {
     event.preventDefault();
     setLoading(true);
 
-    const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
-    if (!adminToken || user.trim() === "" || password.trim() === "") {
+    if (!user.trim() || !password.trim()) {
       setLoginError("Credenciais inválidas.");
       setLoading(false);
       return;
     }
 
-    if (user === "admin" && password === "pax2026") {
-      setLoginError("");
-      await loadAcceptances();
-      setLogged(true);
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user: user.trim(), password }),
+    });
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      setLoginError(result?.error || "E-mail ou senha inválidos.");
       setLoading(false);
       return;
     }
 
-    setLoginError("E-mail ou senha inválidos.");
+    setLoginError("");
+    await loadAcceptances();
+    setLogged(true);
     setLoading(false);
   }
 
