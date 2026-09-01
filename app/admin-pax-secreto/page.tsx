@@ -62,7 +62,12 @@ export default function Admin() {
     }
 
     const data = await response.json();
-    setRows((data || []).map((row: any) => ({ name: row.name, cpf: row.cpf, phone: row.phone || "Não informado", acceptedAt: row.created_at })));
+    setRows((data || []).map((row: any) => ({
+      name: row.name,
+      cpf: row.cpf,
+      phone: row.phone || "Não informado",
+      acceptedAt: row.accepted_at || row.created_at,
+    })));
   }
 
   async function login(event: React.FormEvent) {

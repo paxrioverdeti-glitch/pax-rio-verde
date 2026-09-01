@@ -22,8 +22,8 @@ export async function getAcceptancesForAdmin() {
   const supabaseAdmin = createSupabaseAdminClient();
   const { data, error } = await supabaseAdmin
     .from("acceptances")
-    .select("id, name, cpf, phone, created_at")
-    .order("created_at", { ascending: false });
+    .select("id, name, cpf, phone, accepted_at")
+    .order("accepted_at", { ascending: false });
 
   if (error) {
     throw error;
