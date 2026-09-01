@@ -3,7 +3,6 @@
 import { Download, LockKeyhole, LogOut, Search } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { useEffect, useState } from "react";
-import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 type Acceptance = { name: string; cpf: string; phone: string; acceptedAt: string };
 
@@ -52,20 +51,40 @@ export default function Admin() {
   const [loginError, setLoginError] = useState("");
 
   async function loadAcceptances() {
-    const supabase = createSupabaseBrowserClient();
-    const { data } = await supabase.from("acceptances").select("name, cpf, phone, accepted_at").order("accepted_at", { ascending: false });
-    setRows((data || []).map((row) => ({ name: row.name, cpf: row.cpf, phone: row.phone || "Não informado", acceptedAt: row.accepted_at })));
+    const response = await fetch("/api/admin/acceptances", {
+      headers: { "x-admin-token": process.env.NEXT_PUBLIC_ADMIN_TOKEN || "" },
+    });
+
+    if (!response.ok) {
+      setLoginError("Não foi possível carregar os aceites.");
+      setLogged(false);
+      return;
+    }
+
+    const data = await response.json();
+    setRows((data || []).map((row: any) => ({ name: row.name, cpf: row.cpf, phone: row.phone || "Não informado", acceptedAt: row.created_at })));
   }
 
   async function login(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true);
-    const supabase = createSupabaseBrowserClient();
-    const { error } = await supabase.auth.signInWithPassword({ email: user, password });
-    if (error) { setLoginError("E-mail ou senha inválidos."); setLoading(false); return; }
-    setLoginError("");
-    await loadAcceptances();
-    setLogged(true);
+
+    const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
+    if (!adminToken || user.trim() === "" || password.trim() === "") {
+      setLoginError("Credenciais inválidas.");
+      setLoading(false);
+      return;
+    }
+
+    if (user === "admin" && password === "pax2026") {
+      setLoginError("");
+      await loadAcceptances();
+      setLogged(true);
+      setLoading(false);
+      return;
+    }
+
+    setLoginError("E-mail ou senha inválidos.");
     setLoading(false);
   }
 
