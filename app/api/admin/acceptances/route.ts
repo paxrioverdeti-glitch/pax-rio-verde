@@ -1,17 +1,19 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getAcceptancesForAdmin } from "@/lib/supabase-admin";
+import { createSessionValue } from "../login/route";
 
 export async function GET() {
   const cookieStore = await cookies();
   const session = cookieStore.get("admin_session");
+  const expectedSession = createSessionValue(process.env.ADMIN_USERNAME ?? "");
 
   if (!process.env.ADMIN_SESSION_SECRET) {
     console.error("Missing ADMIN_SESSION_SECRET env var.");
     return NextResponse.json({ error: "Servidor não configurado." }, { status: 500 });
   }
 
-  if (!session || session.value !== "authenticated") {
+  if (!session || session.value !== expectedSession) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

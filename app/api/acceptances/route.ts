@@ -20,6 +20,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Telefone inválido." }, { status: 400 });
     }
 
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error("Missing Supabase env vars for acceptances route.");
+      return NextResponse.json(
+        { error: "Serviço temporariamente indisponível." },
+        { status: 500 },
+      );
+    }
+
     const supabaseAdmin = createSupabaseAdminClient();
     const { error } = await supabaseAdmin.from("acceptances").insert({
       name,

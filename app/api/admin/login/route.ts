@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac } from "node:crypto";
 
-function createSessionValue(username: string) {
+export function createSessionValue(username: string) {
   const secret = process.env.ADMIN_SESSION_SECRET;
 
   if (!secret) {
