@@ -62,7 +62,7 @@ export default function Admin() {
     }
 
     const data = await response.json();
-    setRows((data || []).map((row: any) => ({
+    setRows((data || []).map((row: { name: string; cpf: string; phone?: string | null; accepted_at?: string | null; created_at: string }) => ({
       name: row.name,
       cpf: row.cpf,
       phone: row.phone || "Não informado",
