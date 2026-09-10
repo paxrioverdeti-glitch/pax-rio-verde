@@ -6,6 +6,17 @@ import { useEffect, useState } from "react";
 
 type Acceptance = { name: string; cpf: string; phone: string; acceptedAt: string };
 
+function getDateKey(value: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(value));
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 function csvDownload(rows: Acceptance[], filename: string) {
   const csv = ["Nome,CPF,Telefone,Data do aceite", ...rows.map((row) => [row.name, row.cpf, row.phone, new Date(row.acceptedAt).toLocaleString("pt-BR")].map((value) => `"${value}"`).join(","))].join("\n");
   const link = document.createElement("a");
@@ -16,6 +27,7 @@ function csvDownload(rows: Acceptance[], filename: string) {
 
 function pdfDownload(rows: Acceptance[], filename: string) {
   const pdf = new jsPDF();
+  const rowsPerPage = 4;
   pdf.setTextColor(7, 91, 60);
   pdf.setFontSize(20);
   pdf.text("Pax Rio Verde", 20, 24);
@@ -25,7 +37,16 @@ function pdfDownload(rows: Acceptance[], filename: string) {
   pdf.setDrawColor(73, 175, 61);
   pdf.line(20, 42, 190, 42);
   rows.forEach((row, index) => {
-    const top = 58 + index * 52;
+    if (index > 0 && index % rowsPerPage === 0) {
+      pdf.addPage();
+      pdf.setTextColor(7, 91, 60);
+      pdf.setFontSize(14);
+      pdf.text("Pax Rio Verde - Relatório de aceites", 20, 24);
+      pdf.setDrawColor(73, 175, 61);
+      pdf.line(20, 32, 190, 32);
+    }
+
+    const top = 48 + (index % rowsPerPage) * 52;
     pdf.setTextColor(7, 91, 60);
     pdf.setFontSize(13);
     pdf.text(`${index + 1}. ${row.name}`, 20, top);
@@ -106,7 +127,7 @@ export default function Admin() {
 
   const filtered = rows.filter((row) => {
     const matchesText = `${row.name} ${row.cpf}`.toLowerCase().includes(query.toLowerCase());
-    const acceptedDate = row.acceptedAt.slice(0, 10);
+    const acceptedDate = getDateKey(row.acceptedAt);
     const matchesStart = !startDate || acceptedDate >= startDate;
     const matchesEnd = !endDate || acceptedDate <= endDate;
     return matchesText && matchesStart && matchesEnd;
