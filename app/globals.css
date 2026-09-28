@@ -22,11 +22,10 @@
 .install-warning strong { color:#a0441e; }
 .install-links-label { margin:0 18px !important; max-width:none !important; color:var(--deep) !important; font-size:12px !important; font-weight:700; letter-spacing:.02em; }
 .store-row { display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:center; padding:16px; }
-.store-badge { display:inline-flex; align-items:center; gap:12px; width:220px; max-width:100%; min-height:58px; padding:10px 18px; box-sizing:border-box; background:#000; border:1px solid #333; border-radius:11px; text-decoration:none; transition:transform .2s ease, opacity .2s ease; }
+.store-badge { display:inline-flex; align-items:center; justify-content:center; width:220px; max-width:100%; min-height:58px; padding:10px 18px; box-sizing:border-box; background:#000; border:1px solid #333; border-radius:11px; text-decoration:none; transition:transform .2s ease, opacity .2s ease; }
 .store-badge:hover { transform:translateY(-2px); opacity:.92; }
 .store-badge:focus-visible { outline:3px solid var(--deep); outline-offset:3px; }
-.store-glyph { width:28px !important; height:28px !important; min-width:28px; flex:0 0 28px; display:block; }
-.store-text { display:flex; flex-direction:column; justify-content:center; line-height:1.15; color:#fff; text-align:left; }
+.store-text { display:flex; flex-direction:column; justify-content:center; line-height:1.15; color:#fff; text-align:center; }
 .store-text small { font-size:9px; letter-spacing:.5px; text-transform:uppercase; opacity:.95; }
 .store-text strong { font-size:19px; font-weight:600; letter-spacing:.2px; }
 .badge-icon { display:none; }
