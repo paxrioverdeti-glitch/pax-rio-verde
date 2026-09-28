@@ -3,6 +3,7 @@
 import { Download, LockKeyhole, LogOut, Search } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { useEffect, useState } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 type Acceptance = { name: string; cpf: string; phone: string; acceptedAt: string };
 
@@ -62,7 +63,7 @@ function pdfDownload(rows: Acceptance[], filename: string) {
 
 export default function Admin() {
   const [logged, setLogged] = useState(false);
-  const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [query, setQuery] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -70,6 +71,18 @@ export default function Admin() {
   const [rows, setRows] = useState<Acceptance[]>([]);
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
+
+  const supabase = createSupabaseBrowserClient();
+
+  // Se já houver uma sessão Supabase ativa, entra direto.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        loadAcceptances().then(() => setLogged(true));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function loadAcceptances() {
     const response = await fetch("/api/admin/acceptances", {
@@ -94,36 +107,39 @@ export default function Admin() {
   async function login(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true);
+    setLoginError("");
 
-    if (!user.trim() || !password.trim()) {
-      setLoginError("Credenciais inválidas.");
+    if (!email.trim() || !password.trim()) {
+      setLoginError("E-mail e senha são obrigatórios.");
       setLoading(false);
       return;
     }
 
-    const response = await fetch("/api/admin/login", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user: user.trim(), password }),
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
     });
 
-    if (!response.ok) {
-      const result = await response.json().catch(() => ({}));
-      setLoginError(result?.error || "E-mail ou senha inválidos.");
+    if (error) {
+      setLoginError("E-mail ou senha inválidos.");
       setLoading(false);
       return;
     }
 
-    setLoginError("");
     await loadAcceptances();
     setLogged(true);
     setLoading(false);
   }
 
-  if (!logged) return <main className="admin-shell"><div className="admin-login"><div className="admin-lock"><LockKeyhole /></div><span className="eyebrow">PAX RIO VERDE · RESTRITO</span><h1>Acesso administrativo.</h1><p>Entre para acompanhar os aceites do aplicativo.</p><form onSubmit={login}><label>Usuário<input value={user} onChange={(event) => setUser(event.target.value)} placeholder="seu usuário" /></label><label>Senha<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="senha" /></label>{loginError && <small className="form-error">{loginError}</small>}<button className="primary-button" disabled={loading}>{loading ? "VALIDANDO..." : "ENTRAR"}</button></form></div></main>;
+  async function logout() {
+    await supabase.auth.signOut();
+    setLogged(false);
+    setRows([]);
+    setEmail("");
+    setPassword("");
+  }
+
+  if (!logged) return <main className="admin-shell"><div className="admin-login"><div className="admin-lock"><LockKeyhole /></div><span className="eyebrow">PAX RIO VERDE · RESTRITO</span><h1>Acesso administrativo.</h1><p>Entre para acompanhar os aceites do aplicativo.</p><form onSubmit={login}><label>E-mail<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="seu@email.com" /></label><label>Senha<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="senha" /></label>{loginError && <small className="form-error">{loginError}</small>}<button className="primary-button" disabled={loading}>{loading ? "VALIDANDO..." : "ENTRAR"}</button></form></div></main>;
 
   const filtered = rows.filter((row) => {
     const matchesText = `${row.name} ${row.cpf}`.toLowerCase().includes(query.toLowerCase());
@@ -133,5 +149,5 @@ export default function Admin() {
     return matchesText && matchesStart && matchesEnd;
   });
 
-  return <main className="admin-shell"><header className="admin-header"><div><span className="eyebrow">PAX RIO VERDE · OPERAÇÕES</span><h1>Painel administrativo<br /><strong>aceites do app.</strong></h1></div><button className="logout" onClick={() => setLogged(false)}><LogOut size={15} /> sair</button></header><section className="admin-toolbar"><div className="search"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filtrar por nome ou CPF" /></div><label className="date-filter">De<input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label><label className="date-filter">Até<input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label><button className="green-button" onClick={() => pdfDownload(filtered, "relatorio-pax-rio-verde.pdf")}><Download size={16} /> Baixar relatório PDF</button></section><div className="admin-meta"><span><b>{filtered.length}</b> aceites registrados</span><span>Atualizado agora</span></div><section className="acceptance-grid">{filtered.map((row, index) => <article className="acceptance-card" key={`${row.cpf}-${index}`}><div className="card-top"><span>ACEITE #{String(index + 1).padStart(2, "0")}</span><i /></div><h2>{row.name}</h2><dl><div><dt>CPF</dt><dd>{row.cpf}</dd></div><div><dt>Telefone</dt><dd>{row.phone}</dd></div><div><dt>Data e hora</dt><dd>{new Date(row.acceptedAt).toLocaleString("pt-BR")}</dd></div></dl><button className="card-download" onClick={() => pdfDownload([row], `aceite-${row.cpf}.pdf`)}><Download size={14} /> Baixar dados individuais</button></article>)}</section></main>;
+  return <main className="admin-shell"><header className="admin-header"><div><span className="eyebrow">PAX RIO VERDE · OPERAÇÕES</span><h1>Painel administrativo<br /><strong>aceites do app.</strong></h1></div><button className="logout" onClick={logout}><LogOut size={15} /> sair</button></header><section className="admin-toolbar"><div className="search"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filtrar por nome ou CPF" /></div><label className="date-filter">De<input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label><label className="date-filter">Até<input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label><button className="green-button" onClick={() => pdfDownload(filtered, "relatorio-pax-rio-verde.pdf")}><Download size={16} /> Baixar relatório PDF</button></section><div className="admin-meta"><span><b>{filtered.length}</b> aceites registrados</span><span>Atualizado agora</span></div><section className="acceptance-grid">{filtered.map((row, index) => <article className="acceptance-card" key={`${row.cpf}-${index}`}><div className="card-top"><span>ACEITE #{String(index + 1).padStart(2, "0")}</span><i /></div><h2>{row.name}</h2><dl><div><dt>CPF</dt><dd>{row.cpf}</dd></div><div><dt>Telefone</dt><dd>{row.phone}</dd></div><div><dt>Data e hora</dt><dd>{new Date(row.acceptedAt).toLocaleString("pt-BR")}</dd></div></dl><button className="card-download" onClick={() => pdfDownload([row], `aceite-${String(index + 1).padStart(3, "0")}.pdf`)}><Download size={14} /> Baixar dados individuais</button></article>)}</section></main>;
 }

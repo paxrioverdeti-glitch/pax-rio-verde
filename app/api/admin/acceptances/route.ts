@@ -1,19 +1,12 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getAcceptancesForAdmin } from "@/lib/supabase-admin";
-import { createSessionValue } from "../login/route";
+import { getAuthenticatedAdmin } from "@/lib/supabase-server";
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  const expectedSession = createSessionValue(process.env.ADMIN_USERNAME ?? "");
+  // Exige uma sessão válida do Supabase Auth.
+  const admin = await getAuthenticatedAdmin();
 
-  if (!process.env.ADMIN_SESSION_SECRET) {
-    console.error("Missing ADMIN_SESSION_SECRET env var.");
-    return NextResponse.json({ error: "Servidor não configurado." }, { status: 500 });
-  }
-
-  if (!session || session.value !== expectedSession) {
+  if (!admin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -21,7 +14,7 @@ export async function GET() {
     const data = await getAcceptancesForAdmin();
     return NextResponse.json(data);
   } catch (error) {
-    console.error(error);
+    console.error("admin-acceptances:", error instanceof Error ? error.message : "unknown error");
     return NextResponse.json(
       { error: "Falha ao buscar aceites." },
       { status: 500 },
