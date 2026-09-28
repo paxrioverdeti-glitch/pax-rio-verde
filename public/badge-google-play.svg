@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="203" height="60" viewBox="0 0 203 60" role="img" aria-label="Disponível no Google Play">
+  <rect x="0.5" y="0.5" width="202" height="59" rx="9.5" fill="#000000" stroke="#A6A6A6"/>
+  <g transform="translate(15 15)">
+    <path d="M0.6 0.4C0.35 0.68 0.2 1.1 0.2 1.66V28.34C0.2 28.9 0.35 29.32 0.62 29.58L0.71 29.66L15.65 14.72V14.54V14.36L0.71 -0.58L0.6 0.4Z" fill="url(#a)"/>
+    <path d="M20.63 19.71L15.65 14.72V14.54V14.36L20.64 9.38L20.75 9.45L26.65 12.8C28.34 13.75 28.34 15.32 26.65 16.28L20.75 19.63L20.63 19.71Z" fill="url(#b)"/>
+    <path d="M20.75 19.63L15.65 14.54L0.6 29.58C1.16 30.17 2.07 30.24 3.11 29.66L20.75 19.63Z" fill="url(#c)"/>
+    <path d="M20.75 9.45L3.11 -0.58C2.07 -1.16 1.16 -1.09 0.6 -0.5L15.65 14.54L20.75 9.45Z" fill="url(#d)"/>
+    <defs>
+      <linearGradient id="a" x1="14.32" y1="1.38" x2="-5.74" y2="21.44" gradientUnits="userSpaceOnUse"><stop stop-color="#00A0FF"/><stop offset="0.01" stop-color="#00A1FF"/><stop offset="0.26" stop-color="#00BEFF"/><stop offset="0.51" stop-color="#00D2FF"/><stop offset="0.76" stop-color="#00DFFF"/><stop offset="1" stop-color="#00E3FF"/></linearGradient>
+      <linearGradient id="b" x1="28.85" y1="14.54" x2="-0.2" y2="14.54" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE000"/><stop offset="0.41" stop-color="#FFBD00"/><stop offset="0.78" stop-color="#FFA500"/><stop offset="1" stop-color="#FF9C00"/></linearGradient>
+      <linearGradient id="c" x1="17.98" y1="17.3" x2="-9.27" y2="44.55" gradientUnits="userSpaceOnUse"><stop stop-color="#FF3A44"/><stop offset="1" stop-color="#C31162"/></linearGradient>
+      <linearGradient id="d" x1="-3.04" y1="-9.19" x2="9.13" y2="2.98" gradientUnits="userSpaceOnUse"><stop stop-color="#32A071"/><stop offset="0.07" stop-color="#2DA771"/><stop offset="0.48" stop-color="#15CF74"/><stop offset="0.8" stop-color="#06E775"/><stop offset="1" stop-color="#00F076"/></linearGradient>
+    </defs>
+  </g>
+  <text x="52" y="24" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="9" letter-spacing="0.5">DISPONÍVEL NO</text>
+  <text x="51" y="45" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="600">Google Play</text>
+</svg>
