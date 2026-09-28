@@ -32,3 +32,27 @@ automaticamente para um contador em memória (por instância, menos robusto).
 4. Cole os dois valores no `.env.local` e nas Environment Variables da Vercel.
 
 O plano gratuito do Upstash costuma cobrir folgado o volume de um site de aceites.
+
+## CAPTCHA — Cloudflare Turnstile (NOVO)
+
+Opcional, mas recomendado. Se NÃO configurar, o cadastro funciona sem CAPTCHA
+(a verificação é ignorada automaticamente).
+
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY=...   # chave pública (aparece no navegador — ok expor)
+    TURNSTILE_SECRET_KEY=...             # SECRETA — só no servidor, valida o token
+
+### Como obter
+
+1. Acesse https://dash.cloudflare.com e faça login (conta gratuita).
+2. No menu lateral, vá em "Turnstile".
+3. Clique em "Add site" / "Adicionar site":
+   - Nome: `pax-rio-verde`
+   - Domínios: adicione o domínio do seu site na Vercel (ex.: `seu-site.vercel.app`)
+     e também `localhost` (para testar no seu computador).
+   - Widget mode: "Managed" (recomendado — decide sozinho quando desafiar).
+4. Após criar, a Cloudflare mostra duas chaves:
+   - "Site Key"   -> vai em NEXT_PUBLIC_TURNSTILE_SITE_KEY
+   - "Secret Key" -> vai em TURNSTILE_SECRET_KEY
+5. Cole as duas no `.env.local` e nas Environment Variables da Vercel.
+
+O Turnstile é gratuito e sem limite prático de uso.

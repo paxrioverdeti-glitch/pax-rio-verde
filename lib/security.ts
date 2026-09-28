@@ -197,3 +197,39 @@ export function maybeSweep() {
     sweepBuckets();
   }
 }
+
+/**
+ * Verifica um token do Cloudflare Turnstile junto ao servidor da Cloudflare.
+ *
+ * Fallback seguro: se TURNSTILE_SECRET_KEY não estiver configurada, retorna
+ * true (verificação desligada) — assim o site funciona antes de você criar as
+ * chaves. Quando a chave existir, um token ausente ou inválido é rejeitado.
+ */
+export async function verifyTurnstile(
+  token: string | undefined,
+  remoteIp?: string,
+): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true; // CAPTCHA não configurado -> não bloqueia.
+
+  if (!token) return false;
+
+  try {
+    const body = new URLSearchParams();
+    body.append("secret", secret);
+    body.append("response", token);
+    if (remoteIp && remoteIp !== "unknown") body.append("remoteip", remoteIp);
+
+    const res = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      { method: "POST", body },
+    );
+    const data = (await res.json()) as { success?: boolean };
+    return data.success === true;
+  } catch (error) {
+    console.error("turnstile-verify:", error instanceof Error ? error.message : "unknown");
+    // Em caso de falha de rede na verificação, NÃO deixa passar (fail-closed)
+    // quando o CAPTCHA está configurado.
+    return false;
+  }
+}

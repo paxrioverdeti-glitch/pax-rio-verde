@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
-import { getClientIp, isValidCpf, maybeSweep, rateLimit } from "@/lib/security";
+import { getClientIp, isValidCpf, maybeSweep, rateLimit, verifyTurnstile } from "@/lib/security";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,6 +20,16 @@ export async function POST(request: NextRequest) {
     const name = String(body?.name ?? "").trim();
     const cpf = String(body?.cpf ?? "").replace(/\D/g, "");
     const phone = String(body?.phone ?? "").replace(/\D/g, "");
+    const captchaToken = String(body?.captchaToken ?? "");
+
+    // Verificação de CAPTCHA (Turnstile). Sem chave configurada, é ignorada.
+    const humanOk = await verifyTurnstile(captchaToken, ip);
+    if (!humanOk) {
+      return NextResponse.json(
+        { error: "Falha na verificação de segurança. Recarregue a página e tente novamente." },
+        { status: 400 },
+      );
+    }
 
     if (name.length < 3 || name.length > 120) {
       return NextResponse.json({ error: "Nome inválido." }, { status: 400 });
