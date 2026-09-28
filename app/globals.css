@@ -22,8 +22,9 @@
 .install-warning strong { color:#a0441e; }
 .install-links-label { margin:0 18px !important; max-width:none !important; color:var(--deep) !important; font-size:12px !important; font-weight:700; letter-spacing:.02em; }
 .store-row { display:flex; flex-direction:column; gap:14px; align-items:center; justify-content:center; padding:18px; }
-.store-badge { display:inline-flex; align-items:center; justify-content:center; text-decoration:none; transition:transform .2s ease, opacity .2s ease; }
-.store-badge img { display:block; height:52px; width:auto; }
+.store-badge { display:inline-flex; align-items:center; justify-content:center; width:200px; max-width:100%; min-height:48px; text-decoration:none; border-radius:9px; transition:transform .2s ease, opacity .2s ease; }
+.store-badge img { display:block; width:100%; height:auto; }
+.store-badge:focus-visible { outline:3px solid var(--deep); outline-offset:3px; }
 .store-badge:hover { transform:translateY(-2px); opacity:.9; }
 .badge-icon { display:none; }
 .info-contact { display:flex; align-items:center; justify-content:space-between; gap:18px; max-width:1050px; margin:0 auto 20px; padding:18px 20px; border:1px solid rgba(118,158,132,.25); border-radius:18px; background:rgba(255,255,255,.6); box-shadow:0 18px 35px rgba(11,62,43,.06); }
