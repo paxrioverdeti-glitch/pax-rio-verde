@@ -7,6 +7,17 @@ import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 type Acceptance = { name: string; cpf: string; phone: string; acceptedAt: string };
 
+/**
+ * Mascara o CPF para exibição NA TELA (minimização de dado / LGPD).
+ * Ex.: "12345678910" -> "***.***.*89-10". O PDF/CSV continuam com o CPF
+ * completo, pois o relatório exportado é o uso legítimo do admin.
+ */
+function maskCpf(cpf: string) {
+  const digits = (cpf || "").replace(/\D/g, "");
+  if (digits.length !== 11) return cpf; // formato inesperado: mostra como veio
+  return `***.***.*${digits.slice(8, 9)}-${digits.slice(9, 11)}`;
+}
+
 function getDateKey(value: string) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Sao_Paulo",
@@ -149,5 +160,5 @@ export default function Admin() {
     return matchesText && matchesStart && matchesEnd;
   });
 
-  return <main className="admin-shell"><header className="admin-header"><div><span className="eyebrow">PAX RIO VERDE · OPERAÇÕES</span><h1>Painel administrativo<br /><strong>aceites do app.</strong></h1></div><button className="logout" onClick={logout}><LogOut size={15} /> sair</button></header><section className="admin-toolbar"><div className="search"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filtrar por nome ou CPF" /></div><label className="date-filter">De<input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label><label className="date-filter">Até<input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label><button className="green-button" onClick={() => pdfDownload(filtered, "relatorio-pax-rio-verde.pdf")}><Download size={16} /> Baixar relatório PDF</button></section><div className="admin-meta"><span><b>{filtered.length}</b> aceites registrados</span><span>Atualizado agora</span></div><section className="acceptance-grid">{filtered.map((row, index) => <article className="acceptance-card" key={`${row.cpf}-${index}`}><div className="card-top"><span>ACEITE #{String(index + 1).padStart(2, "0")}</span><i /></div><h2>{row.name}</h2><dl><div><dt>CPF</dt><dd>{row.cpf}</dd></div><div><dt>Telefone</dt><dd>{row.phone}</dd></div><div><dt>Data e hora</dt><dd>{new Date(row.acceptedAt).toLocaleString("pt-BR")}</dd></div></dl><button className="card-download" onClick={() => pdfDownload([row], `aceite-${String(index + 1).padStart(3, "0")}.pdf`)}><Download size={14} /> Baixar dados individuais</button></article>)}</section></main>;
+  return <main className="admin-shell"><header className="admin-header"><div><span className="eyebrow">PAX RIO VERDE · OPERAÇÕES</span><h1>Painel administrativo<br /><strong>aceites do app.</strong></h1></div><button className="logout" onClick={logout}><LogOut size={15} /> sair</button></header><section className="admin-toolbar"><div className="search"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filtrar por nome ou CPF" /></div><label className="date-filter">De<input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label><label className="date-filter">Até<input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label><button className="green-button" onClick={() => pdfDownload(filtered, "relatorio-pax-rio-verde.pdf")}><Download size={16} /> Baixar relatório PDF</button></section><div className="admin-meta"><span><b>{filtered.length}</b> aceites registrados</span><span>Atualizado agora</span></div><section className="acceptance-grid">{filtered.map((row, index) => <article className="acceptance-card" key={`${row.cpf}-${index}`}><div className="card-top"><span>ACEITE #{String(index + 1).padStart(2, "0")}</span><i /></div><h2>{row.name}</h2><dl><div><dt>CPF</dt><dd>{maskCpf(row.cpf)}</dd></div><div><dt>Telefone</dt><dd>{row.phone}</dd></div><div><dt>Data e hora</dt><dd>{new Date(row.acceptedAt).toLocaleString("pt-BR")}</dd></div></dl><button className="card-download" onClick={() => pdfDownload([row], `aceite-${String(index + 1).padStart(3, "0")}.pdf`)}><Download size={14} /> Baixar dados individuais</button></article>)}</section></main>;
 }
