@@ -137,6 +137,21 @@ export default function Admin() {
       return;
     }
 
+    // Login no Supabase passou, mas isso NÃO basta: a conta precisa estar na
+    // allowlist de admins. Confirmamos no servidor. Se não for admin, deslogamos
+    // e mostramos a MESMA mensagem genérica — assim "e-mail não existe", "senha
+    // errada" e "conta existe mas não é admin" ficam indistinguíveis (anti-enumeração).
+    const whoami = await fetch("/api/admin/whoami", { credentials: "include" })
+      .then((response) => response.json())
+      .catch(() => ({ admin: false }));
+
+    if (!whoami?.admin) {
+      await supabase.auth.signOut();
+      setLoginError("E-mail ou senha inválidos.");
+      setLoading(false);
+      return;
+    }
+
     await loadAcceptances();
     setLogged(true);
     setLoading(false);
