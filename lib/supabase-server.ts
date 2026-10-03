@@ -27,7 +27,25 @@ export async function createSupabaseServerClient() {
 }
 
 /**
- * Retorna o usuário autenticado (via Supabase Auth) ou null.
+ * Lê a allowlist de administradores da variável de ambiente ADMIN_EMAILS
+ * (lista separada por vírgula). Normaliza para minúsculas e remove vazios.
+ */
+function getAdminAllowlist(): string[] {
+  return (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/**
+ * Retorna o usuário SE E SOMENTE SE ele for um administrador autorizado,
+ * caso contrário null.
+ *
+ * Autenticado NÃO é o mesmo que autorizado: antes esta função só checava se
+ * existia QUALQUER sessão Supabase válida — o que deixava qualquer conta do
+ * projeto (ex.: alguém que se auto-cadastrou) ler a base inteira de aceites.
+ * Agora o e-mail do usuário precisa estar na allowlist ADMIN_EMAILS.
+ *
  * Usa getUser(), que valida o token junto ao servidor do Supabase —
  * mais seguro que confiar apenas na sessão do cookie.
  */
@@ -36,5 +54,21 @@ export async function getAuthenticatedAdmin() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user?.email) return null;
+
+  const allowlist = getAdminAllowlist();
+
+  // Fail-closed: sem allowlist configurada, ninguém é admin.
+  // Isso evita que um deploy sem ADMIN_EMAILS libere o painel para todos.
+  if (allowlist.length === 0) {
+    console.error(
+      "ADMIN_EMAILS não configurada — painel admin bloqueado por segurança (fail-closed).",
+    );
+    return null;
+  }
+
+  if (!allowlist.includes(user.email.toLowerCase())) return null;
+
   return user;
 }

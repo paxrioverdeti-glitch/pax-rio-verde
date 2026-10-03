@@ -16,6 +16,27 @@ da Vercel (produção). **Nunca** versione valores reais.
     ADMIN_PASSWORD=...
     ADMIN_SESSION_SECRET=...            # segredo forte e aleatório para assinar a sessão
 
+## Allowlist de administradores (NOVO — OBRIGATÓRIO)
+
+**Sem esta variável, o painel admin fica BLOQUEADO (fail-closed) por segurança.**
+
+Antes, qualquer conta logada no projeto Supabase (inclusive alguém que se
+auto-cadastrasse) conseguia ler a base inteira de CPFs. Agora só os e-mails
+listados aqui são tratados como administradores.
+
+    ADMIN_EMAILS=...   # e-mails de admin separados por vírgula (SÓ no servidor, NUNCA com NEXT_PUBLIC_)
+
+Exemplo:
+
+    ADMIN_EMAILS=adminpaxrioverde@pax.com
+
+Depois de criar/editar no painel da Vercel, faça **Redeploy** — env var só
+entra em vigor num deploy novo.
+
+> Dica extra: no painel do Supabase, em **Authentication -> Providers -> Email**,
+> desligue "Enable Signups" se você não precisa de auto-cadastro. Isso impede
+> que estranhos criem contas no seu projeto.
+
 ## Rate limiting — Upstash Redis (NOVO)
 
 Opcional, mas recomendado em produção. Se NÃO configurar, o rate limit cai
