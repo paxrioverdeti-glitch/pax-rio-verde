@@ -7,6 +7,9 @@ export async function POST(request: NextRequest) {
     maybeSweep();
 
     const ip = getClientIp(request);
+    // Trilha de auditoria: guardamos quem/como registrou o aceite, para que ele
+    // seja defensável juridicamente (LGPD) e rastreável em caso de contestação.
+    const userAgent = (request.headers.get("user-agent") ?? "").slice(0, 500);
     // Máx. 10 aceites por IP a cada 10 minutos (evita flood/envenenamento da base).
     const limit = await rateLimit(`acceptances:${ip}`, 10, 10 * 60 * 1000);
     if (!limit.allowed) {
@@ -56,6 +59,8 @@ export async function POST(request: NextRequest) {
       name,
       cpf,
       phone,
+      ip,
+      user_agent: userAgent,
     });
 
     if (error) {

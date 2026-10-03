@@ -210,7 +210,16 @@ export async function verifyTurnstile(
   remoteIp?: string,
 ): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) return true; // CAPTCHA não configurado -> não bloqueia.
+  if (!secret) {
+    // Em PRODUÇÃO, a ausência da chave é tratada como falha (fail-closed):
+    // sem CAPTCHA configurado no ar, bots conseguiriam floodar a base. Em
+    // desenvolvimento, continua liberando para facilitar os testes locais.
+    if (process.env.NODE_ENV === "production") {
+      console.error("TURNSTILE_SECRET_KEY ausente em produção — bloqueando por segurança.");
+      return false;
+    }
+    return true; // dev: CAPTCHA opcional.
+  }
 
   if (!token) return false;
 
